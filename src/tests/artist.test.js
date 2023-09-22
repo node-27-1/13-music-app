@@ -1,5 +1,7 @@
 const request = require('supertest');
 const app = require('../app');
+const Genre = require('../models/Genre');
+require('../models');
 
 let id;
 
@@ -31,6 +33,22 @@ test('PUT /artists/:id debe actualizar un artista', async () => {
   expect(res.status).toBe(200);
   expect(res.body.name).toBe(artistUpdated.name);
 });
+
+
+// 1. Crear un género
+// 2. Ejecutar el endpoint, pasándole el id del género creado
+// 3. Eliminar el género
+// 4. Expect del status y uno del largo del body
+test('POST /artists/:id/genres debe insertar los géneros de un artista', async () => {
+  const genre = await Genre.create({ name: "pop" });
+  const res = await request(app)
+    .post(`/artists/${id}/genres`)
+    .send([genre.id]);
+  await genre.destroy();
+  expect(res.status).toBe(200);
+  expect(res.body.length).toBe(1);
+});
+
 
 test('DELETE /artists/:id debe eliminar un artista', async () => {
   const res = await request(app).delete(`/artists/${id}`);
